@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://47.94.208.1:3306/db_bankManager
+    username: root
+    password: tYt2004128@qq.com
+  redis:
+    host: 47.94.208.1
+    port: 6378
+    password: tyt

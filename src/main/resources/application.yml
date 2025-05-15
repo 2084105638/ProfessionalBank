@@ -3,11 +3,13 @@ server:
   servlet:
     context-path: /professionalBank
 spring:
+  profiles:
+    active: prod
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 12345
     username: root
-    url: jdbc:mysql://localhost:3306/db_bankManager
+    password: tYt2004128@qq.com
+    url: jdbc:mysql://47.94.208.1:3306/db_bankManager
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariCPDatasource
       minimum-idle: 5
@@ -18,11 +20,10 @@ spring:
       connection-timeout: 30000
       connection-test-query: SELECT 1
   redis:
-      database: 0
-      host: 127.0.0.1
+      host: localhost
       port: 6378
-      timeout: 2000
       password: tyt
+      timeout: 2000
       jedis:
         pool:
           max-active: 20
@@ -30,6 +31,7 @@ spring:
           max-idle: 10
           min-idle: 0
     #mybatis 大小写转驼峰
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
