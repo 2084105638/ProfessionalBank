@@ -80,7 +80,7 @@ public class AdminController extends BaseController{
         return getSuccessResponseVO(ret);
     }
 
-    @DeleteMapping("")
+    @DeleteMapping("/deleteNews")
     public ResponseVO deleteNews(String newsId){
         log.info("管理员删除新闻");
         String ret = adminService.deleteNews(newsId);
