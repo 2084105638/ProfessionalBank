@@ -9,7 +9,10 @@ import com.tyt.bankmanagersystem.entity.vo.admin.AdminLoginVO;
 import com.tyt.bankmanagersystem.entity.vo.admin.AdminUserCardsVO;
 import com.tyt.bankmanagersystem.entity.vo.response.ResponseVO;
 import com.tyt.bankmanagersystem.service.AdminService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,8 +61,11 @@ public class AdminController extends BaseController{
         return getSuccessResponseVO(null);
     }
 
-    @PostMapping("/addNews")
-    public ResponseVO addNews(@RequestPart AddNewsDTO addNewsDTO,@RequestParam MultipartFile newsPhoto){
+
+    @PostMapping(value = "/addNews",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseVO addNews(@RequestPart AddNewsDTO addNewsDTO,
+                              @Parameter(description = "新闻配图", required = true, content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                              @RequestParam MultipartFile newsPhoto){
         log.info("管理员添加新闻");
         String ret = adminService.addNews(addNewsDTO,newsPhoto);
         return getSuccessResponseVO(ret);

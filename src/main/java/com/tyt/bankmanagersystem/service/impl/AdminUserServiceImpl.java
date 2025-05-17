@@ -113,7 +113,6 @@ public class AdminUserServiceImpl implements AdminService {
 
         news.setNewsPhoto(photoName);
         news.setTime(LocalDateTime.now());
-        System.out.println(news);
         newsMapper.insert(news);
 
 
