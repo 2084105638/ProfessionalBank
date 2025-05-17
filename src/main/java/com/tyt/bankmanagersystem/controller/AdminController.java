@@ -56,9 +56,9 @@ public class AdminController extends BaseController{
     }
 
     @PostMapping("/unfreezeUserCard")
-    public ResponseVO unfreezeUserCard(@RequestParam String userName){
+    public ResponseVO unfreezeUserCard(@RequestParam String cardNumber){
         log.info("管理员解冻用户");
-        String ret = adminService.unfreezeUserCard(userName);
+        String ret = adminService.unfreezeUserCard(cardNumber);
         return getSuccessResponseVO(ret);
     }
 
