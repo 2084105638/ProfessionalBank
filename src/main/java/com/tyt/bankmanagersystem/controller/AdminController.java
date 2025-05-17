@@ -1,13 +1,15 @@
 package com.tyt.bankmanagersystem.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.tyt.bankmanagersystem.entity.dto.admin.AddNewsDTO;
 import com.tyt.bankmanagersystem.entity.dto.admin.AdminLoginDTO;
-import com.tyt.bankmanagersystem.entity.dto.admin.AdminUserDTO;
+
+import com.tyt.bankmanagersystem.entity.dto.admin.AdminPageUserCardsDTO;
 import com.tyt.bankmanagersystem.entity.vo.admin.AdminLoginVO;
-import com.tyt.bankmanagersystem.entity.vo.admin.AdminUserVO;
+import com.tyt.bankmanagersystem.entity.vo.admin.AdminUserCardsVO;
 import com.tyt.bankmanagersystem.entity.vo.response.ResponseVO;
 import com.tyt.bankmanagersystem.service.AdminService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -34,25 +36,32 @@ public class AdminController extends BaseController{
         return getSuccessResponseVO(adminLoginVO);
     }
 
-    @PostMapping("/users")
-    public ResponseVO getUsers(@RequestBody AdminUserDTO adminUserDTO){
-        log.info("管理员获得用户信息");
-        Page<AdminUserVO> users = adminService.getUsers(adminUserDTO);
+    @PostMapping("/UserCards")
+    public ResponseVO getUserCards(@RequestBody AdminPageUserCardsDTO adminUserCardsDTO){
+        log.info("管理员获得用户银行卡信息");
+        Page<AdminUserCardsVO> users = adminService.getUserCards(adminUserCardsDTO);
         return getSuccessResponseVO(users);
     }
 
-    @PostMapping("/freezeUser")
-    public ResponseVO freezeUser(@RequestParam String userName){
+    @PostMapping("/freezeUserCard")
+    public ResponseVO freezeUserCard(@RequestParam String cardNumber){
         log.info("管理员冻结用户");
-        adminService.freezeUser(userName);
+        String ret = adminService.freezeUserCard(cardNumber);
+        return getSuccessResponseVO(ret);
+    }
+
+    @PostMapping("/unfreezeUserCard")
+    public ResponseVO unfreezeUserCard(@RequestParam String userName){
+        log.info("管理员解冻用户");
+        adminService.unfreezeUserCard(userName);
         return getSuccessResponseVO(null);
     }
 
-    @PostMapping("/unfrezeUser")
-    public ResponseVO unfreezeUser(@RequestParam String UserName){
-        log.info("管理员解冻用户");
-        adminService.unfreezeUser(UserName);
-        return getSuccessResponseVO(null);
+    @PostMapping("/addNews")
+    public ResponseVO addNews(@RequestBody AddNewsDTO addNewsDTO){
+        log.info("管理员添加新闻");
+        String ret =  adminService.addNews(addNewsDTO);
+        return getSuccessResponseVO(ret);
     }
 
 }

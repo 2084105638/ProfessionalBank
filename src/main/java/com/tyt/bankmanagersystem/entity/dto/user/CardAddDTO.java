@@ -17,5 +17,4 @@ import java.util.Date;
 public class CardAddDTO {
     private Long typeId;
     private String payPassword;
-    private String cardNumber;
 }

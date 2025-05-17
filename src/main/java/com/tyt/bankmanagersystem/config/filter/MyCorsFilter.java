@@ -19,10 +19,12 @@ public class MyCorsFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         String origin = req.getHeader("Origin");
-        res.setHeader("Access-Control-Allow-Origin", origin);
-        res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-        res.setHeader("Access-Control-Allow-Credentials", "true");
+        if (origin != null && !origin.isEmpty()) {
+            res.setHeader("Access-Control-Allow-Origin", origin);
+            res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+            res.setHeader("Access-Control-Allow-Credentials", "true");
+        }
 
         // 对于预检请求（OPTIONS）立即返回 200
         if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {

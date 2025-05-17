@@ -1,25 +1,24 @@
-package com.tyt.bankmanagersystem.entity.vo;
+package com.tyt.bankmanagersystem.entity.dto.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Sylphy
- * @Description 新闻视图
- * @create 2025/4/28
- * */
+ * @Description
+ * @create 2025/5/15
+ */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewsVO {
+@Builder
+public class AddNewsDTO {
     private String title;
+    private String context;
     private String newsPhoto;
-    private String content;
-    private Date time;
     private String author;
 }

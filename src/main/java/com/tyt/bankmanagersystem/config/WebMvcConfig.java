@@ -46,7 +46,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**")
                 // 登录、注册接口不拦截
-                .excludePathPatterns("/user/login", "/user/register","/user/checkCode","/user/loginByJson","/admin/login",
+                .excludePathPatterns("/user/login", "/user/register","/user/checkCode","/user/loginByJson","/admin/login","/user/index",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",

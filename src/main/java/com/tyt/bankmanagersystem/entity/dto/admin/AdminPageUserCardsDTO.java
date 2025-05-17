@@ -1,4 +1,4 @@
-package com.tyt.bankmanagersystem.entity.vo.admin;
+package com.tyt.bankmanagersystem.entity.dto.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,12 +10,13 @@ import lombok.NoArgsConstructor;
  * @Description
  * @create 2025/5/3
  * */
-@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminLoginVO {
-    private String jwtToken;
-    private String username;
-    private String role;
+@Builder
+public class AdminPageUserCardsDTO {
+    private Integer current;
+    private Integer size;
+    private String sort;
+    private String name;
 }

@@ -19,10 +19,10 @@ public class JwtUtil {
 
 
     //生成Token
-    public String generateToken(String phone){
+    public String generateToken(String jwtKey){
 
         return Jwts.builder()
-                .setSubject(phone)
+                .setSubject(jwtKey)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KET.getBytes()), SignatureAlgorithm.HS256)

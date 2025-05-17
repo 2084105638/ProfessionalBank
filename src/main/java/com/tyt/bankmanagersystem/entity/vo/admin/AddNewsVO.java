@@ -8,14 +8,11 @@ import lombok.NoArgsConstructor;
 /**
  * @author Sylphy
  * @Description
- * @create 2025/5/3
- * */
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AdminLoginVO {
-    private String jwtToken;
-    private String username;
-    private String role;
-}
+ * @create 2025/5/15
+ */
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Builder
+//public class AddNewsVO {
+//}

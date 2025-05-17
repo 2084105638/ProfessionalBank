@@ -114,12 +114,22 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public IPage<NewsVO> getIndex() {
-        Page<News> objectPage = new Page<>(1, 3);
+        Page<News> objectPage = new Page<>();
+//        if(size != null && current != null){
+//            objectPage.setCurrent(current);
+//            objectPage.setSize(size);
+//        }
 
         Page<News> newsPage = newsMapper.selectPage(objectPage, null);
+        List<NewsVO> newsVOList = newsPage.getRecords().stream().map(news -> {
+            NewsVO newsVO = new NewsVO();
+            BeanUtils.copyProperties(news, newsVO);
+            newsVO.setNewsPhoto("todo:minio上传图片");
+            return newsVO;
+        }).collect(Collectors.toList());
         Page<NewsVO> newsVOPage = new Page<>();
-        //TODO beanutils不能完成嵌套类型的属性拷贝
         BeanUtils.copyProperties(newsPage,newsVOPage);
+        newsVOPage.setRecords(newsVOList);
         return newsVOPage;
     }
 
@@ -129,10 +139,11 @@ public class UserServiceImpl implements UserService{
             throw new BusinessException("添加失败，银行卡信息有误");
         }
 
-        cardAddDTO.setCardNumber(String.valueOf(RandomUtils.nextLong(1000000000L, 9999999999L)));
         BankCard bankCard = new BankCard();
         BeanUtils.copyProperties(cardAddDTO,bankCard);
         bankCard.setPayPassword(MD5Util.md5( bankCard.getPayPassword()));
+        bankCard.setCardNumber(String.valueOf(RandomUtils.nextLong(1000000000L, 9999999999L)));
+
 
         User user = getCurrentUser();
         if(user == null){
@@ -228,10 +239,7 @@ public class UserServiceImpl implements UserService{
         System.out.println(card.getBalance());
         System.out.println(BigDecimal.valueOf(0.000));
         if (!Objects.equals(card.getBalance(), BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))) {
-            return UnbindVO.builder()
-                    .cardNumber(card.getCardNumber())
-                    .status("删除失败,卡内有余额")
-                    .build();
+            throw new BusinessException("删除失败,卡内有余额");
         }
         //todo 检查一些其他和银行卡有关的联系，如果有必要则禁止删除银行卡(使用策略模式)
         cardMapper.deleteById(card.getCardId());

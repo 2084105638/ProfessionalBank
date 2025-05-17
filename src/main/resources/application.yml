@@ -8,7 +8,7 @@ spring:
   datasource:
     username: root
     password: tYt2004128@qq.com
-    url: jdbc:mysql://47.94.208.1:3306/db_bankManager
+    url: jdbc:mysql://47.94.208.1:3306/db_bankManager?serverTimezone=UTC&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariCPDatasource

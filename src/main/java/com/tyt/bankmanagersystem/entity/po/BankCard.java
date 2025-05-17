@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -30,9 +31,9 @@ public class BankCard {
   @TableField
   private long status;
   @TableField
-  private Date createdAt;
+  private LocalDateTime createdAt;
   @TableField(fill = FieldFill.UPDATE)
-  private Date updatedAt;
+  private LocalDateTime updatedAt;
   @TableField
   private BigDecimal balance;
 
