@@ -7,3 +7,9 @@ spring:
     host: 47.94.208.1
     port: 6378
     password: tyt
+
+minio:
+  endpoint: http://47.94.208.1:9000
+  access-key: miniotyt
+  secret-key: miniotyt
+  bucket-name: bank-manager-system-bucket

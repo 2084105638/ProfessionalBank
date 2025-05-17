@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -20,6 +21,6 @@ public class NewsVO {
     private String title;
     private String newsPhoto;
     private String content;
-    private Date time;
+    private LocalDateTime time;
     private String author;
 }

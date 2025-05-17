@@ -11,6 +11,7 @@ import com.tyt.bankmanagersystem.entity.vo.response.ResponseVO;
 import com.tyt.bankmanagersystem.service.AdminService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -58,9 +59,9 @@ public class AdminController extends BaseController{
     }
 
     @PostMapping("/addNews")
-    public ResponseVO addNews(@RequestBody AddNewsDTO addNewsDTO){
+    public ResponseVO addNews(@RequestPart AddNewsDTO addNewsDTO,@RequestParam MultipartFile newsPhoto){
         log.info("管理员添加新闻");
-        String ret =  adminService.addNews(addNewsDTO);
+        String ret = adminService.addNews(addNewsDTO,newsPhoto);
         return getSuccessResponseVO(ret);
     }
 

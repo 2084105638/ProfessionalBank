@@ -3,6 +3,7 @@ package com.tyt.bankmanagersystem.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.tyt.bankmanagersystem.MinioConfig;
 import com.tyt.bankmanagersystem.config.ThreadLocalHolder;
 import com.tyt.bankmanagersystem.config.exception.BusinessException;
 import com.tyt.bankmanagersystem.entity.TransactionType;
@@ -23,6 +24,10 @@ import com.tyt.bankmanagersystem.service.UserService;
 import com.tyt.bankmanagersystem.utils.JwtUtil;
 import com.tyt.bankmanagersystem.utils.MD5Util;
 import io.jsonwebtoken.lang.Maps;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.errors.*;
+import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.aop.ThrowsAdvice;
@@ -33,8 +38,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -70,6 +78,10 @@ public class UserServiceImpl implements UserService{
     private TransactionRecordMapper transactionRecordMapper;
     @Resource
     ThreadLocalHolder threadLocalHolder;
+    @Resource
+    MinioClient minioClient;
+    @Resource
+    MinioConfig minioConfig;
 
     @Override
     public UserLoginVO login(UserLoginDTO userLoginDTO) {
@@ -114,18 +126,33 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public IPage<NewsVO> getIndex() {
-        Page<News> objectPage = new Page<>();
+        Page<News> objectPage = new Page<>(1,100);
 //        if(size != null && current != null){
 //            objectPage.setCurrent(current);
 //            objectPage.setSize(size);
 //        }
-
         Page<News> newsPage = newsMapper.selectPage(objectPage, null);
         List<NewsVO> newsVOList = newsPage.getRecords().stream().map(news -> {
             NewsVO newsVO = new NewsVO();
             BeanUtils.copyProperties(news, newsVO);
-            newsVO.setNewsPhoto("todo:minio上传图片");
-            return newsVO;
+            System.out.println(news.getTime());
+            // 生成预签名访问 URL（有效期1小时）
+            try {
+                String url = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder()
+                                .bucket(minioConfig.getBucketName())
+                                .object(news.getNewsPhoto())
+                                .method(Method.GET)
+                                .expiry(60 * 60)  // 秒数
+                                .build()
+                );
+                newsVO.setNewsPhoto(url);
+                return newsVO;
+            } catch (ErrorResponseException | ServerException | XmlParserException | NoSuchAlgorithmException |
+                     IOException | InvalidResponseException | InvalidKeyException | InternalException |
+                     InsufficientDataException e) {
+                throw new RuntimeException(e);
+            }
         }).collect(Collectors.toList());
         Page<NewsVO> newsVOPage = new Page<>();
         BeanUtils.copyProperties(newsPage,newsVOPage);

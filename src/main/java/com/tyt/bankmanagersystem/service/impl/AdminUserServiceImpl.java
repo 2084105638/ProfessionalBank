@@ -1,8 +1,7 @@
 package com.tyt.bankmanagersystem.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.tyt.bankmanagersystem.MinioConfig;
 import com.tyt.bankmanagersystem.config.AdminConfig;
 import com.tyt.bankmanagersystem.config.exception.BusinessException;
 import com.tyt.bankmanagersystem.entity.dto.admin.AddNewsDTO;
@@ -11,7 +10,6 @@ import com.tyt.bankmanagersystem.entity.dto.admin.AdminLoginDTO;
 import com.tyt.bankmanagersystem.entity.dto.admin.AdminPageUserCardsDTO;
 import com.tyt.bankmanagersystem.entity.po.BankCard;
 import com.tyt.bankmanagersystem.entity.po.News;
-import com.tyt.bankmanagersystem.entity.po.User;
 import com.tyt.bankmanagersystem.entity.vo.admin.AdminLoginVO;
 import com.tyt.bankmanagersystem.entity.vo.admin.AdminUserCardsVO;
 import com.tyt.bankmanagersystem.mapper.CardMapper;
@@ -20,16 +18,22 @@ import com.tyt.bankmanagersystem.mapper.UserMapper;
 import com.tyt.bankmanagersystem.service.AdminService;
 import com.tyt.bankmanagersystem.utils.JwtUtil;
 import io.jsonwebtoken.lang.Maps;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.smartcardio.Card;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.UUID;
 
 /**
  * @author Sylphy
@@ -50,6 +54,10 @@ public class AdminUserServiceImpl implements AdminService {
     private CardMapper cardMapper;
     @Resource
     private NewsMapper newsMapper;
+    @Resource
+    private MinioConfig minioConfig;
+    @Resource
+    private MinioClient minioClient;
 
     @Override
     public Page<AdminUserCardsVO> getUserCards(AdminPageUserCardsDTO adminPageUserCardsDTO) {
@@ -95,11 +103,40 @@ public class AdminUserServiceImpl implements AdminService {
     }
 
     @Override
-    public String addNews(AddNewsDTO addNewsDTO) {
+    public String addNews(AddNewsDTO addNewsDTO, MultipartFile newsPhoto) {
+        String bucket = minioConfig.getBucketName();
+        String photoName = UUID.randomUUID() + "_" + newsPhoto.getOriginalFilename();
+        System.out.println(photoName);
+
         News news = new News();
         BeanUtils.copyProperties(addNewsDTO,news);
+
+        news.setNewsPhoto(photoName);
         news.setTime(LocalDateTime.now());
+        System.out.println(news);
         newsMapper.insert(news);
+
+
+        // 如果桶不存在则创建
+        try {
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+            }
+            // 上传文件
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(photoName)
+                            .stream(newsPhoto.getInputStream(), newsPhoto.getSize(), -1)
+                            .contentType(newsPhoto.getContentType())
+                            .build()
+            );
+        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
+                 InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
+                 XmlParserException e) {
+            throw new RuntimeException(e);
+        }
+
 
         return "上传成功";
     }

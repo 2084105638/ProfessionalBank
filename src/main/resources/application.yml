@@ -4,11 +4,15 @@ server:
     context-path: /professionalBank
 spring:
   profiles:
-    active: prod
+    active:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   datasource:
     username: root
-    password: tYt2004128@qq.com
-    url: jdbc:mysql://47.94.208.1:3306/db_bankManager?serverTimezone=UTC&useSSL=false
+    password: 12345
+    url: jdbc:mysql://localhost:3306/db_bankManager?serverTimezone=UTC&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariCPDatasource
@@ -32,6 +36,7 @@ spring:
           min-idle: 0
     #mybatis 大小写转驼峰
 
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
@@ -46,5 +51,10 @@ bank-admin:
   admin-username: tyt
   password: tyt
 
+minio:
+  endpoint: http://localhost:9000
+  access-key: miniotyt
+  secret-key: miniotyt
+  bucket-name: bank-manager-system-bucket
 
 
