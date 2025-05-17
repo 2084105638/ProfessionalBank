@@ -18,10 +18,7 @@ import com.tyt.bankmanagersystem.mapper.UserMapper;
 import com.tyt.bankmanagersystem.service.AdminService;
 import com.tyt.bankmanagersystem.utils.JwtUtil;
 import io.jsonwebtoken.lang.Maps;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -62,8 +59,8 @@ public class AdminUserServiceImpl implements AdminService {
     @Override
     public Page<AdminUserCardsVO> getUserCards(AdminPageUserCardsDTO adminPageUserCardsDTO) {
         Page<AdminUserCardsVO> page = new Page<>(adminPageUserCardsDTO.getCurrent(),adminPageUserCardsDTO.getSize());
-        cardMapper.getUserCards(page, adminPageUserCardsDTO);
-        System.out.println(page);
+        Page<AdminUserCardsVO> userCards = cardMapper.getUserCards(page, adminPageUserCardsDTO);
+        System.out.println(userCards.getRecords());
         Page<AdminUserCardsVO> adminUserCardsVOPage = new Page<>();
         BeanUtils.copyProperties(page,adminUserCardsVOPage);
         return adminUserCardsVOPage;
@@ -98,8 +95,17 @@ public class AdminUserServiceImpl implements AdminService {
     }
 
     @Override
-    public void unfreezeUserCard(String userName) {
-
+    public String unfreezeUserCard(String cardNumber) {
+        BankCard card = cardMapper.selectByMap(Maps.of("card_number", (Object) cardNumber).build())
+                .stream()
+                .findFirst()
+                .orElse(null);
+        if(card == null){
+            throw new BusinessException("未找到银行卡");
+        }
+        card.setStatus(1);
+        cardMapper.updateById(card);
+        return "解冻成功";
     }
 
     @Override
@@ -138,5 +144,31 @@ public class AdminUserServiceImpl implements AdminService {
 
 
         return "上传成功";
+    }
+
+    @Override
+    public String deleteNews(String newsId) {
+        String bucket = minioConfig.getBucketName();
+        News news = newsMapper.selectById(newsId);
+        if(news == null){
+            throw new BusinessException("未查到对应新闻");
+        }
+        newsMapper.deleteById(newsId);
+
+
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(news.getNewsPhoto())
+                            .build()
+            );
+        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
+                 InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
+                 XmlParserException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "删除成功";
     }
 }

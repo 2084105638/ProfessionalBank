@@ -11,6 +11,7 @@ import com.tyt.bankmanagersystem.entity.vo.response.ResponseVO;
 import com.tyt.bankmanagersystem.service.AdminService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -57,18 +58,32 @@ public class AdminController extends BaseController{
     @PostMapping("/unfreezeUserCard")
     public ResponseVO unfreezeUserCard(@RequestParam String userName){
         log.info("管理员解冻用户");
-        adminService.unfreezeUserCard(userName);
-        return getSuccessResponseVO(null);
+        String ret = adminService.unfreezeUserCard(userName);
+        return getSuccessResponseVO(ret);
     }
 
 
     @PostMapping(value = "/addNews",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseVO addNews(@RequestPart AddNewsDTO addNewsDTO,
-                              @Parameter(description = "新闻配图", required = true, content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
-                              @RequestParam MultipartFile newsPhoto){
+    public ResponseVO addNews(@Parameter(description = "新闻配图", required = true, content = @Content(mediaType = MediaType.IMAGE_PNG_VALUE))
+                              @RequestParam("newsPhoto") MultipartFile newsPhoto,
+                              @Parameter(
+                                      description = "新闻对象",
+                                      required = true,
+                                      content = @Content(
+                                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                              schema = @Schema(implementation = AddNewsDTO.class)
+                                      )
+                              )
+                              @RequestPart("addNewsDTO") AddNewsDTO addNewsDTO){
         log.info("管理员添加新闻");
         String ret = adminService.addNews(addNewsDTO,newsPhoto);
         return getSuccessResponseVO(ret);
     }
 
+    @DeleteMapping("")
+    public ResponseVO deleteNews(String newsId){
+        log.info("管理员删除新闻");
+        String ret = adminService.deleteNews(newsId);
+        return getSuccessResponseVO(ret);
+    }
 }

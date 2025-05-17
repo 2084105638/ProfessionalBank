@@ -20,7 +20,9 @@ public interface AdminService {
 
     String freezeUserCard(String cardNumber);
 
-    void unfreezeUserCard(String userName);
+    String unfreezeUserCard(String userName);
 
     String addNews(AddNewsDTO addNewsDTO, MultipartFile newsPhoto);
+
+    String deleteNews(String newsId);
 }
