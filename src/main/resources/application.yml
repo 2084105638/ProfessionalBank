@@ -4,7 +4,7 @@ server:
     context-path: /professionalBank
 spring:
   profiles:
-    active:
+    active: prod
   servlet:
     multipart:
       max-file-size: 10MB

@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewsVO {
-    private Long id;
+    private Integer id;
     private String title;
     private String newsPhoto;
     private String content;

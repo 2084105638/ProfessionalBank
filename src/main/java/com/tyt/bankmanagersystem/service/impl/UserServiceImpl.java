@@ -229,11 +229,19 @@ public class UserServiceImpl implements UserService{
         if(relateBankCard == null){
             throw new BusinessException("找不到对应银行卡");
         }
+        if(bankCard.getStatus() == 0){
+            throw new BusinessException("银行卡被冻结");
+        }
+        if(relateBankCard.getStatus() == 0){
+            throw new BusinessException("对方银行卡被冻结");
+        }
 
         relateBankCard.setBalance(relateBankCard.getBalance().add(rollOutDTO.getAmount()));
         bankCard.setBalance(bankCard.getBalance().subtract(rollOutDTO.getAmount()));
 
-        //todo 对卡内余额进行检查，如果小于0，则禁止转账
+        if(bankCard.getBalance().compareTo(BigDecimal.ZERO) < 0){
+            throw new BusinessException("余额不足");
+        }
         //转出记录
         TransactionRecord rollOutRecord = TransactionRecord.builder()
                 .transactionType(TransactionType.transfer_out)
