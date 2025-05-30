@@ -13,3 +13,6 @@ minio:
   access-key: miniotyt
   secret-key: miniotyt
   bucket-name: bank-manager-system-bucket
+logging:
+  file:
+    name: logs/app.log
